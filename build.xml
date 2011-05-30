@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="install" name="project-web">
+	<property name="project.path" value="../.." />
+	<property name="project.version" value="2.0" />
+	<property name="project.category" value="modules" />
+	<property name="project.depends.jar" value="roma-core.jar roma-frontend.jar" />
+	<property name="project.depends.prj" value="modules/core modules/frontend" />
+
+	<import file="${project.path}/common/default-build.xml" />
+
+	<path id="project.classpath">
+		<fileset dir="lib" includes="**/*.jar" />
+		<fileset dir="scaffolding/lib" includes="**/*.jar" />
+	</path>
+</project>

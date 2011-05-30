@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="compile" name="#{project.name}">
+	<property environment="env" />
+
+  <property name="project.src"         value="src"/>
+	<property name="project.web"         value="WebContent" />
+	<property name="project.lib.compile" value="lib" />
+	<property name="project.lib.runtime" value="${project.web}/WEB-INF/lib" />
+	<property name="project.build"       value="${project.web}/WEB-INF/classes" />
+	<property name="project.dist"        value="dist" />
+  
+  <property name="project.depends" value=""/>
+  <property name="project.mainclass" value=""/>
+  
+	<path id="project.classpath">
+		<pathelement location="${project.build}" />
+		<fileset dir="${project.lib.compile}" includes="**/*.jar" />
+		<fileset dir="${project.lib.runtime}" includes="**/*.jar" />
+
+		<!-- UNCOMMENT THESE LINES IF YOU'RE LINKING THE ROMA PROJECTS IN THE IDE
+		     THESE INCLUSIONS ARE NEEDED BY ANT SINCE THE PROJECTS IN ECLIPSE IDE
+		     WORKS WITH PROJECT DEPENDENCIES NOT VISIBLE BY ANT
+		     
+		<fileset dir="${env.ROMA_HOME}/modules/core/lib" includes="roma-*.jar" />
+        <fileset dir="${env.ROMA_HOME}/modules/frontend/lib" includes="roma-*.jar" />
+		<fileset dir="${env.ROMA_HOME}/modules/view-echo2/lib" includes="roma-*.jar" />
+		<fileset dir="${env.ROMA_HOME}/modules/persistence-datanucleus/lib" includes="roma-*.jar" />
+		<fileset dir="${env.ROMA_HOME}/modules/admin/lib" includes="**.jar" />
+		<fileset dir="${env.ROMA_HOME}/modules/users/lib" includes="**.jar" />
+		-->
+	</path>
+
+	<target name="init">
+		<mkdir dir="${project.build}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${project.build}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<echo message="${ant.project.name}: ${ant.file}" />
+		<javac destdir="${project.build}">
+			<src path="${project.src}" />
+			<classpath refid="project.classpath" />
+		</javac>
+ 
+    <!-- COPY RESOURCES -->
+    <copy todir="${project.build}">
+	    <fileset dir="${project.src}">
+	      <exclude name="**/*.java"/>
+	    </fileset>
+    </copy>
+  </target>
+
+	<target name="install" depends="compile">
+		<mkdir dir="${project.dist}" />
+		<delete file="${project.dist}/${ant.project.name}.war" />
+
+		<war compress="true" destfile="${project.dist}/${ant.project.name}.war" webxml="${project.web}/WEB-INF/web.xml">
+			<fileset dir="${project.web}">
+				<include name="**/*">
+				</include>
+			</fileset>
+		</war>
+	</target>
+
+	<target name="backup-init">
+	  <buildnumber/>
+    <mkdir dir="backup"/>
+	</target>
+
+	<target name="backup" depends="backup-init">
+		<zip destfile="backup/${ant.project.name}-${build.number}.zip" basedir="." level="9" update="false" excludes="backup" />
+	</target>
+	
+	<target name="backup-src" depends="backup-init">
+		<zip destfile="backup/${ant.project.name}-${build.number}.zip" basedir="." level="9" update="false" excludes="**/classes/** backup/** **/*.class **/*.jar" />
+	</target>
+	
+
+</project>

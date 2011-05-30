@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties PUBLIC "JAVA PROPERTIES" "http://www.romaframework.org/schema/properties.dtd">
+<properties>
+	<comment>ROMA Framework configuration file</comment>
+	<entry key="package">#{project.package}</entry>
+	<entry key="package-path">#{project.package-path}</entry>
+	<entry key="src">src</entry>
+	<entry key="compile-time-lib">lib</entry>
+	<entry key="run-time-lib">WebContent/WEB-INF/lib</entry>
+	<entry key="ioc-path">src/META-INF/components</entry>
+	<entry key="ioc-file">applicationContext.xml</entry>
+</properties>

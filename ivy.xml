@@ -1,0 +1,17 @@
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+	<info organisation="org.romaframework" module="roma-project-web" revision="2.9" />
+	<configurations defaultconfmapping="*->*,!sources,!javadoc,!optional">
+		<conf name="test" />
+		<conf name="wizard" />
+	</configurations>
+	<publications>
+		<artifact name="roma-project-web" ext="jar" type="jar"></artifact>
+		<artifact name="roma-project-web-test" ext="jar" type="jar" conf="test"></artifact>
+		<artifact name="roma-project-web-wizard" ext="jar" type="zip" conf="wizard"></artifact>
+	</publications>
+	<dependencies>
+		<dependency org="org.romaframework" name="roma-frontend" rev="latest.integration" />
+		<dependency org="commons-fileupload" name="commons-fileupload" rev="latest.integration" />
+	</dependencies>
+</ivy-module>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+	<appender name="LOGFILE" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="log/#{project.name}.log" />
+		<param name="Append" value="true"></param>
+		<param name="MaxFileSize" value="1000KB" />
+		<param name="MaxBackupIndex" value="5" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %x - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ABSOLUTE} %-5p %x %m%n" />
+		</layout>
+	</appender>
+
+	<!-- YOUR APPLICATION LOG SETTINGS:
+		Set the priority value to DEBUG for best debug -->
+	<category name="#{project.package}">
+		<priority value="DEBUG" />
+		<!-- appender-ref ref="LOGFILE"/-->
+	</category>
+
+	<!-- ROMA FRAMEWORK APPLICATION LOG SETTINGS:
+		Set the priority value to DEBUG for best debug -->
+	<category name="org.romaframework">
+		<priority value="INFO" />
+	</category>
+	<category name="org.romaframework.core.schema">
+		<priority value="INFO" />
+	</category>
+
+	<!-- DataNucleus LOG SETTINGS:
+		Set the priority value to DEBUG for best debug -->
+	<category name="DataNucleus">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.JDO">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.Cache">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.MetaData">
+		<priority value="ERROR" />
+	</category>
+	<category name="DataNucleus.General">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.Utility">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.Transaction">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.Datastore">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.ClassLoading">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.Plugin">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.ValueGeneration">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.Enhancer">
+		<priority value="WARN" />
+	</category>
+	<category name="DataNucleus.SchemaTool">
+		<priority value="WARN" />
+	</category>
+
+	<!-- GLOBAL SETTINGS -->
+	<root>
+		<priority value="INFO" />
+		<appender-ref ref="STDOUT" />
+	</root>
+</log4j:configuration>
