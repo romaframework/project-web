@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.romaframework.aspect.service.ServiceAspect;
 import org.romaframework.aspect.service.ServiceInfo;
 import org.romaframework.aspect.service.UnmanagedServiceAspectAbstract;
 import org.romaframework.aspect.service.feature.ServiceClassFeatures;
@@ -73,9 +72,9 @@ public class RestServiceModule extends UnmanagedServiceAspectAbstract {
 	 * @throws SecurityException
 	 * 
 	 */
-	public void invokeService(HttpServletRequest iRequest, HttpServletResponse iResponse, String serviceName, String operation,
-			String... parameters) throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException, UnsupportedOperationException, SecurityException, NoSuchMethodException {
+	public void invokeService(HttpServletRequest iRequest, HttpServletResponse iResponse, String serviceName, String operation, String... parameters)
+			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnsupportedOperationException,
+			SecurityException, NoSuchMethodException {
 		Object service = createServiceInstance(services.get(serviceName));
 
 		Method[] methods = service.getClass().getMethods();
@@ -105,13 +104,11 @@ public class RestServiceModule extends UnmanagedServiceAspectAbstract {
 		// CHECK FOR ADDITIONAL PARAMETERS (REQUEST & RESPONSE)
 		List<Object> additionalParameters = new ArrayList<Object>();
 		;
-		if (invokeOperation.getParameterTypes().length > 0
-				&& invokeOperation.getParameterTypes()[0].isAssignableFrom(HttpServletRequest.class)) {
+		if (invokeOperation.getParameterTypes().length > 0 && invokeOperation.getParameterTypes()[0].isAssignableFrom(HttpServletRequest.class)) {
 			// ADD SERVLET REQUEST AS PARAMETER
 			additionalParameters.add(iRequest);
 
-			if (invokeOperation.getParameterTypes().length > 1
-					&& invokeOperation.getParameterTypes()[1].isAssignableFrom(HttpServletResponse.class))
+			if (invokeOperation.getParameterTypes().length > 1 && invokeOperation.getParameterTypes()[1].isAssignableFrom(HttpServletResponse.class))
 				additionalParameters.add(iResponse);
 		}
 
@@ -136,8 +133,7 @@ public class RestServiceModule extends UnmanagedServiceAspectAbstract {
 	 * @param iAdditionalParameters
 	 * @return
 	 */
-	private Object[] getParameters(Class<?>[] iActionParameterTypes, String[] iServiceParameterValues,
-			List<Object> iAdditionalParameters) {
+	private Object[] getParameters(Class<?>[] iActionParameterTypes, String[] iServiceParameterValues, List<Object> iAdditionalParameters) {
 
 		Object[] objectParameters = new Object[] {};
 
@@ -162,8 +158,7 @@ public class RestServiceModule extends UnmanagedServiceAspectAbstract {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<Object> invokeDynamicService(String serviceURL, String operationName, List<Object> inputs)
-			throws UnsupportedOperationException {
+	public List<Object> invokeDynamicService(String serviceURL, String operationName, List<Object> inputs) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -178,12 +173,10 @@ public class RestServiceModule extends UnmanagedServiceAspectAbstract {
 				continue;
 
 			// Create our service implementation
-			String serviceName = (String) serviceClass.getFeature(ServiceAspect.ASPECT_NAME, ServiceClassFeatures.SERVICE_NAME);
-			Class<?> aspectImplementation = (Class<?>) serviceClass.getFeature(ServiceAspect.ASPECT_NAME,
-					ServiceClassFeatures.ASPECT_IMPLEMENTATION);
+			String serviceName = (String) serviceClass.getFeature(ServiceClassFeatures.SERVICE_NAME);
+			Class<?> aspectImplementation = (Class<?>) serviceClass.getFeature(ServiceClassFeatures.ASPECT_IMPLEMENTATION);
 
-			if (serviceName != null && serviceName.length() > 0
-					&& (aspectImplementation == null || aspectImplementation.equals(getClass()))) {
+			if (serviceName != null && serviceName.length() > 0 && (aspectImplementation == null || aspectImplementation.equals(getClass()))) {
 				services.put(serviceName, serviceClass);
 				log.info("[RestServiceModule] Registered service '" + serviceName + "' binded to class: " + serviceClass);
 			}

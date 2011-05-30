@@ -19,7 +19,6 @@ package org.romaframework.web.session;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.romaframework.aspect.session.SessionAspect;
 import org.romaframework.core.Roma;
 
 /**
