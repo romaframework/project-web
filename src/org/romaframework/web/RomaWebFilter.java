@@ -97,6 +97,7 @@ public class RomaWebFilter implements Filter {
 
 			chain.doFilter(request, response);
 		} finally {
+
 			ObjectContext.getInstance().setContextComponent(HttpAbstractSessionAspect.CONTEXT_REQUEST_PAR, null);
 			ObjectContext.getInstance().setContextComponent(HttpAbstractSessionAspect.CONTEXT_RESPONSE_PAR, null);
 		}

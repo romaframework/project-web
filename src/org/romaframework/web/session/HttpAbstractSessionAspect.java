@@ -53,8 +53,9 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 	}
 
 	public Object getActiveSystemSession() {
-		return getServletRequest()==null?null:getServletRequest().getSession();
+		return getServletRequest() == null ? null : getServletRequest().getSession();
 	}
+
 	public static HttpServletRequest getServletRequest() {
 		return (HttpServletRequest) ObjectContext.getInstance().getContextComponent(HttpAbstractSessionAspect.CONTEXT_REQUEST_PAR);
 	}
@@ -80,8 +81,8 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 
 		if (sessInfo != null) {
 			if (log.isDebugEnabled())
-				log.debug("[HttpSessionAspect.removeSession] Removed session created: account=" + sessInfo.getAccount() + ", source="
-						+ sessInfo.getSource() + ", created=" + sessInfo.getCreated());
+				log.debug("[HttpSessionAspect.removeSession] Removed session created: account=" + sessInfo.getAccount() + ", source=" + sessInfo.getSource()
+						+ ", created=" + sessInfo.getCreated());
 		} else {
 			log.warn("[HttpSessionAspect.removeSession] Can't remove session because it doesn't registered: " + sessionId);
 			return null;
@@ -113,14 +114,15 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 	/**
 	 * Read the property from active HttpSession
 	 */
-	public Object getProperty(String iKey) {
+	public <T> T getProperty(String iKey) {
 		return getProperty(null, iKey);
 	}
 
 	/**
 	 * Read the property from a HttpSession
 	 */
-	public Object getProperty(Object iSession, String iKey) {
+	@SuppressWarnings("unchecked")
+	public <T> T getProperty(Object iSession, String iKey) {
 		HttpSession sess = null;
 
 		if (iSession == null) {
@@ -135,7 +137,7 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 		}
 
 		if (sess != null)
-			return sess.getAttribute(iKey);
+			return (T) sess.getAttribute(iKey);
 
 		return null;
 	}
@@ -143,14 +145,14 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 	/**
 	 * Set the property inside current HttpSession
 	 */
-	public void setProperty(String iKey, Object iValue) {
+	public <T> void setProperty(String iKey, T iValue) {
 		setProperty(getActiveSystemSession(), iKey, iValue);
 	}
 
 	/**
 	 * Set the property inside a HttpSession
 	 */
-	public void setProperty(Object iSession, String iKey, Object iValue) {
+	public <T> void setProperty(Object iSession, String iKey, T iValue) {
 		HttpSession sess = (HttpSession) iSession;
 		if (sess != null)
 			sess.setAttribute(iKey, iValue);
