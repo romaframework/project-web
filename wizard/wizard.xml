@@ -3,7 +3,7 @@
 	<property environment="env" />
 	<property name="roma.home" value="${env.ROMA_HOME}" />
 
-	<import file="${roma.home}/common/wizard/base-wizard.xml" />
+	<import file="../../../base-wizard.xml" />
 
 	<target name="add-module" depends="load-project-info">
 		<echo>Adding 'Web configuration' on project's web.xml -></echo>
@@ -56,48 +56,4 @@
 		</copy>
 	</target>
 
-	<target name="update-module-v2.0.0" depends="load-project-info">
-		<xmltask source="${project.path}/WebContent/WEB-INF/web.xml" dest="${project.path}/WebContent/WEB-INF/web.xml" preservetype="true" expandEntityReferences="false">
-			<xmlcatalog refid="dtds" />
-			<remove path="/web-app/listener[@listener-class='org.romaframework.aspect.session.echo2.HttpSessionCatcher']" />
-			<remove path="/web-app/listener[@id='roma-session-catcher']" />
-		</xmltask>
-		<xmltask source="${project.path}/WebContent/WEB-INF/web.xml" preservetype="true" expandEntityReferences="false" >
-			<copy path="/web-app/context-param/param-name/text()" property="context-param-present" />
-		</xmltask>
-		<if>
-			<isset property="context-param-present" />
-			<then>
-				<xmltask source="${project.path}/WebContent/WEB-INF/web.xml" dest="${project.path}/WebContent/WEB-INF/web.xml" preservetype="true" expandEntityReferences="false">
-					<insert path="/web-app/context-param[last()]" position="after" file="web.xml" />
-				</xmltask>
-			</then>
-			<else>
-				<xmltask source="${project.path}/WebContent/WEB-INF/web.xml" dest="${project.path}/WebContent/WEB-INF/web.xml" preservetype="true" expandEntityReferences="false">
-					<insert path="/web-app/display-name" position="after" file="web.xml" />
-				</xmltask>
-			</else>
-		</if>
-
-		<antcall target="register-def-aspect">
-			<param name="module.aspect-name" value="view" />
-			<param name="module.aspect-component" value="ViewAspect" />
-		</antcall>
-		<antcall target="register-def-aspect">
-			<param name="module.aspect-name" value="session" />
-			<param name="module.aspect-component" value="SessionAspect" />
-		</antcall>
-		<antcall target="register-def-aspect">
-			<param name="module.aspect-name" value="service" />
-			<param name="module.aspect-component" value="RestServiceModule" />
-		</antcall>
-		<antcall target="update-module-libs" />
-		
-		<copy file="../scaffolding/src/META-INF/components/applicationContext-service-rest.xml" todir="${project.path}/${project.ioc-path}">
-			<filterset>
-				<filter token="project.package" value="${project.package}" />
-				<filter token="project.name" value="${project.name}" />
-			</filterset>
-		</copy>
-	</target>
 </project>
