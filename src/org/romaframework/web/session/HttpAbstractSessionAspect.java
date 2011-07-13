@@ -115,7 +115,7 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 	 * Read the property from active HttpSession
 	 */
 	public <T> T getProperty(String iKey) {
-		return getProperty(null, iKey);
+		return (T)getProperty(null, iKey);
 	}
 
 	/**

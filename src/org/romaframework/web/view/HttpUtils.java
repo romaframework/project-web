@@ -1,6 +1,8 @@
 package org.romaframework.web.view;
 
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -11,22 +13,19 @@ import org.apache.commons.logging.LogFactory;
 import org.romaframework.aspect.view.ViewHelper;
 import org.romaframework.core.util.FileUtils;
 
-import sun.net.www.protocol.http.HttpURLConnection;
-
 public class HttpUtils {
-	
-	protected static Log log = LogFactory.getLog(HttpUtils.class);
-	
-  public static void noCache(HttpServletResponse iResponse) {
-    iResponse.setHeader("Pragma", "no-cache");
-    iResponse.addHeader("Cache-Control", "must-revalidate");
-    iResponse.addHeader("Cache-Control", "no-cache");
-    iResponse.addHeader("Cache-Control", "no-store");
-    iResponse.setDateHeader("Expires", 0);
-  }
-  
-  
-	public static StringBuilder loadUrlResource(String url, boolean propagateSession, HttpServletRequest request){
+
+	protected static Log	log	= LogFactory.getLog(HttpUtils.class);
+
+	public static void noCache(HttpServletResponse iResponse) {
+		iResponse.setHeader("Pragma", "no-cache");
+		iResponse.addHeader("Cache-Control", "must-revalidate");
+		iResponse.addHeader("Cache-Control", "no-cache");
+		iResponse.addHeader("Cache-Control", "no-store");
+		iResponse.setDateHeader("Expires", 0);
+	}
+
+	public static StringBuilder loadUrlResource(String url, boolean propagateSession, HttpServletRequest request) {
 		StringBuilder buffer = null;
 		HttpURLConnection connection = null;
 		try {
@@ -38,21 +37,24 @@ public class HttpUtils {
 					log.error("[URLRendering.setContent] Error on loading resource from classpath", e);
 				}
 			} else {
-				connection = new HttpURLConnection(new URL(url), null);
+				URLConnection conn = new URL(url).openConnection();
+				if (conn instanceof HttpURLConnection) {
+					connection = (HttpURLConnection) conn;
 
-				if (propagateSession) {
-					// PROPAGATE ALL THE COOKIES (AND THEREFORE ALSO THE HTTP SESSION) ALLOWING THE SHARING OF OBJECTS BETWEEN POJO AND JSP
-					for (Cookie c : request.getCookies()) {
-						if (c.getName().equals("JSESSIONID")) {
-							connection.setRequestProperty("Cookie", c.getName() + "=" + c.getValue());
-							break;
+					if (propagateSession) {
+						// PROPAGATE ALL THE COOKIES (AND THEREFORE ALSO THE HTTP SESSION) ALLOWING THE SHARING OF OBJECTS BETWEEN POJO AND JSP
+						for (Cookie c : request.getCookies()) {
+							if (c.getName().equals("JSESSIONID")) {
+								connection.setRequestProperty("Cookie", c.getName() + "=" + c.getValue());
+								break;
+							}
 						}
 					}
+
+					connection.connect();
+					buffer = FileUtils.readStreamAsText(connection.getInputStream());
 				}
 
-				connection.connect();
-				buffer = FileUtils.readStreamAsText(connection.getInputStream());
-				
 			}
 		} catch (Exception e) {
 			// DO NOTHING
@@ -63,7 +65,6 @@ public class HttpUtils {
 		}
 		return buffer;
 	}
-
 
 	public static final String	VAR_CLIENT				= "${client}";
 	public static final String	VAR_LOCALHOST			= "${localhost}";
