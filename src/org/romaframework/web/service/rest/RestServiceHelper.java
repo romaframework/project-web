@@ -30,7 +30,6 @@ import org.romaframework.aspect.view.ViewAspect;
 import org.romaframework.aspect.view.command.impl.RedirectViewCommand;
 import org.romaframework.core.Roma;
 import org.romaframework.core.config.ApplicationConfiguration;
-import org.romaframework.frontend.RomaFrontend;
 import org.romaframework.web.session.HttpAbstractSessionAspect;
 
 /**
@@ -64,7 +63,7 @@ public class RestServiceHelper {
 	}
 
 	public static void forwardToForm(Object iForm, String iRealmName) {
-		RomaFrontend.flow().forward(iForm, null, null, Roma.session().getActiveSessionInfo());
+		Roma.flow().forward(iForm, null, null, Roma.session().getActiveSessionInfo());
 
 		// SessionInfo session = Roma.session().getActiveSessionInfo();
 		// if (iForm != null) {
@@ -73,7 +72,7 @@ public class RestServiceHelper {
 		// redirectToApplication(iRealmName);
 		// } else {
 		// redirectToApplication(iRealmName);
-		// RomaFrontend.flow().forward(iForm, "screen://body", null, session);
+		// Roma.flow().forward(iForm, "screen://body", null, session);
 		// }
 		// }
 	}
