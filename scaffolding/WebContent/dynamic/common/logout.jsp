@@ -26,7 +26,7 @@
 <p class="default" align="center"><%=Roma.aspect(I18NAspect.class).getString("Object.logoutOk.label", request.getLocale())%><br />
 <br />
 <a href="<%=request.getContextPath()%>/app"><%=Roma.aspect(I18NAspect.class).getString("Object.logoutRelogin.label", request.getLocale())%></a> <%
- 	Roma.session().destroyCurrentSession(session);
+ 	Roma.session().invalidateSession(session);
  %>
 </p>
 </body>

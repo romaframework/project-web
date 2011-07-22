@@ -103,11 +103,11 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 		return sessions.values();
 	}
 
-	public void destroyCurrentSession() {
-		destroyCurrentSession(getActiveSessionInfo().getSystemSession());
+	public void invalidate() {
+		invalidateSession(getActiveSessionInfo().getSystemSession());
 	}
 
-	public void destroyCurrentSession(Object iSystemSession) {
+	public void invalidateSession(Object iSystemSession) {
 		((HttpSession) iSystemSession).invalidate();
 	}
 
