@@ -42,42 +42,25 @@ public class RestServiceHelper {
 
 	public static void invokeRestService(HttpServletRequest request, HttpServletResponse response) {
 		if (request.getSession().getAttribute(RestServiceConstants.SESSION_I18N_ERROR_ATTRIBUTE_NAME) != null) {
-			String errorMessage = Roma.i18n().getString(
-					(String) request.getSession().getAttribute(RestServiceConstants.SESSION_I18N_ERROR_ATTRIBUTE_NAME));
+			String errorMessage = Roma.i18n().getString((String) request.getSession().getAttribute(RestServiceConstants.SESSION_I18N_ERROR_ATTRIBUTE_NAME));
 			sendToServiceErrorPage(errorMessage, null, request, response);
 		} else if (request.getSession().getAttribute(RestServiceConstants.SESSION_SERVICE_ATTRIBUTE_NAME) != null) {
-			invokeService(request, response, (String) request.getSession().getAttribute(
-					RestServiceConstants.SESSION_SERVICE_ATTRIBUTE_NAME), (String) request.getSession().getAttribute(
-					RestServiceConstants.SESSION_METHOD_ATTRIBUTE_NAME), (String[]) request.getSession().getAttribute(
-					RestServiceConstants.SESSION_PARAMETERS_ATTRIBUTE_NAME));
+			invokeService(request, response, (String) request.getSession().getAttribute(RestServiceConstants.SESSION_SERVICE_ATTRIBUTE_NAME),
+					(String) request.getSession().getAttribute(RestServiceConstants.SESSION_METHOD_ATTRIBUTE_NAME),
+					(String[]) request.getSession().getAttribute(RestServiceConstants.SESSION_PARAMETERS_ATTRIBUTE_NAME));
 		}
 	}
 
 	public static boolean existsServiceToInvoke(HttpServletRequest request) {
-		return (request.getSession().getAttribute(RestServiceConstants.SESSION_I18N_ERROR_ATTRIBUTE_NAME) != null || request
-				.getSession().getAttribute(RestServiceConstants.SESSION_SERVICE_ATTRIBUTE_NAME) != null);
+		return (request.getSession().getAttribute(RestServiceConstants.SESSION_I18N_ERROR_ATTRIBUTE_NAME) != null || request.getSession().getAttribute(
+				RestServiceConstants.SESSION_SERVICE_ATTRIBUTE_NAME) != null);
 	}
 
 	public static void forwardToForm(Object iForm) {
-		forwardToForm(iForm, null);
-	}
-
-	public static void forwardToForm(Object iForm, String iRealmName) {
 		Roma.flow().forward(iForm, null, null, Roma.session().getActiveSessionInfo());
-
-		// SessionInfo session = Roma.session().getActiveSessionInfo();
-		// if (iForm != null) {
-		// if (session == null) {
-		// authenticate(iForm);
-		// redirectToApplication(iRealmName);
-		// } else {
-		// redirectToApplication(iRealmName);
-		// Roma.flow().forward(iForm, "screen://body", null, session);
-		// }
-		// }
 	}
 
-	public static void redirectToApplication(String realmName) {
+	public static void redirectToApplication() {
 		// SEND REDIRECT TO BACK URL
 		HttpServletRequest request = HttpAbstractSessionAspect.getServletRequest();
 		HttpServletResponse response = HttpAbstractSessionAspect.getServletResponse();
@@ -87,11 +70,6 @@ public class RestServiceHelper {
 				responseURL = request.getServletPath();
 			} else if (responseURL.startsWith(request.getContextPath()))
 				responseURL = responseURL.substring(request.getContextPath().length());
-
-			// CONSIDER THE REALM IF ANY
-			if (realmName != null)
-				responseURL += "/" + realmName;
-
 			request.getRequestDispatcher(responseURL).forward(request, response);
 		} catch (IOException ioe) {
 			log.error(ioe);
@@ -113,8 +91,7 @@ public class RestServiceHelper {
 		httpSession.setAttribute("_Login.firstFormToDisplay", iFirstFormToDisplay);
 	}
 
-	protected static void invokeService(HttpServletRequest request, HttpServletResponse response, String serviceName,
-			String serviceOperation, String[] parameters) {
+	protected static void invokeService(HttpServletRequest request, HttpServletResponse response, String serviceName, String serviceOperation, String[] parameters) {
 		clearSession(request);
 		try {
 			RestServiceModule restServiceAspect = Roma.component(RestServiceModule.class);
@@ -140,8 +117,7 @@ public class RestServiceHelper {
 		}
 	}
 
-	protected static void sendToServiceErrorPage(String errorMessage, Exception exception, HttpServletRequest request,
-			HttpServletResponse response) {
+	protected static void sendToServiceErrorPage(String errorMessage, Exception exception, HttpServletRequest request, HttpServletResponse response) {
 		clearSession(request);
 		request.getSession().setAttribute("ErrorMessage", errorMessage);
 		request.getSession().setAttribute("ExceptionThrown", exception);
