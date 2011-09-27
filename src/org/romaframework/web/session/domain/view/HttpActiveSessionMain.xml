@@ -6,8 +6,9 @@
         <view>
             <form>
                 <area type="column">
-                    <area name="fields" type="grid" size="6"/>
+                    <area name="fields" type="grid" size="2"/>
                     <area name="actions" type="row"/>
+                    <area name="sessions" type="placeholder"/>
                 </area>
             </form>
         </view>
