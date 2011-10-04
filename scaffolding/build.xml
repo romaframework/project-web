@@ -1,59 +1,89 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="compile" name="#{project.name}">
+<?xml version="1.0" encoding="utf-8"?>
+<project basedir="." default="compile" name="#{project.name}" xmlns:ivy="antlib:org.apache.ivy.ant">
 	<property environment="env" />
+	<property name="project.src" value="src" />
+	<property name="project.web" value="WebContent" />
+	<property name="project.lib" value="lib" />
+	<property name="project.weblib" value="${project.web}/WEB-INF/lib" />
+	<property name="project.build" value="${project.web}/WEB-INF/classes" />
+	<property name="project.debug" value="on" />
+	<property name="project.debuglevel" value="source,lines,vars" />
+	<property name="project.targetComp" value="1.5" />
+	<property name="project.dist" value="dist" />
 
-  <property name="project.src"         value="src"/>
-	<property name="project.web"         value="WebContent" />
-	<property name="project.lib.compile" value="lib" />
-	<property name="project.lib.runtime" value="${project.web}/WEB-INF/lib" />
-	<property name="project.build"       value="${project.web}/WEB-INF/classes" />
-	<property name="project.dist"        value="dist" />
-  
-  <property name="project.depends" value=""/>
-  <property name="project.mainclass" value=""/>
-  
-	<path id="project.classpath">
-		<pathelement location="${project.build}" />
-		<fileset dir="${project.lib.compile}" includes="**/*.jar" />
-		<fileset dir="${project.lib.runtime}" includes="**/*.jar" />
-
-		<!-- UNCOMMENT THESE LINES IF YOU'RE LINKING THE ROMA PROJECTS IN THE IDE
-		     THESE INCLUSIONS ARE NEEDED BY ANT SINCE THE PROJECTS IN ECLIPSE IDE
-		     WORKS WITH PROJECT DEPENDENCIES NOT VISIBLE BY ANT
-		     
-		<fileset dir="${env.ROMA_HOME}/modules/core/lib" includes="roma-*.jar" />
-        <fileset dir="${env.ROMA_HOME}/modules/frontend/lib" includes="roma-*.jar" />
-		<fileset dir="${env.ROMA_HOME}/modules/view-echo2/lib" includes="roma-*.jar" />
-		<fileset dir="${env.ROMA_HOME}/modules/persistence-datanucleus/lib" includes="roma-*.jar" />
-		<fileset dir="${env.ROMA_HOME}/modules/admin/lib" includes="**.jar" />
-		<fileset dir="${env.ROMA_HOME}/modules/users/lib" includes="**.jar" />
-		-->
-	</path>
-
-	<target name="init">
-		<mkdir dir="${project.build}" />
-	</target>
+	<property name="ivy.install.version" value="2.2.0" />
+	<property name="ivy.jar.file" value="${project.lib}/ivy.jar" />
 
 	<target name="clean">
 		<delete dir="${project.build}" />
 	</target>
 
-	<target name="compile" depends="init">
-		<echo message="${ant.project.name}: ${ant.file}" />
-		<javac destdir="${project.build}">
-			<src path="${project.src}" />
-			<classpath refid="project.classpath" />
-		</javac>
- 
-    <!-- COPY RESOURCES -->
-    <copy todir="${project.build}">
-	    <fileset dir="${project.src}">
-	      <exclude name="**/*.java"/>
-	    </fileset>
-    </copy>
-  </target>
+	<target name="clean-dist">
+		<delete dir="${project.dist}" />
+	</target>
 
-	<target name="install" depends="compile">
+	<target name="clean-ivy" description="--> clean the ivy installation">
+		<delete file="${ivy.jar.file}" />
+	</target>
+
+	<target name="clean-dependencies" description="--> clean the ivy installation">
+		<delete file="${project.weblib}" />
+	</target>
+
+	<target name="clean-all" depends="clean,clean-ivy,clean-dist,clean-dependencies">
+	</target>
+
+	<target name="download-ivy" unless="ivy.download.skip">
+		<mkdir dir="${project.lib}" />
+		<echo message="installing ivy..." />
+		<get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+	</target>
+
+	<target name="install-ivy">
+		<available file="${ivy.jar.file}" property="ivy.download.skip" />
+		<antcall target="download-ivy" />
+		<path id="ivy.lib.path">
+			<fileset dir="${project.lib}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+
+	<target name="resolve-dependencies" depends="install-ivy" unless="ivy.resolve.skip">
+		<echo>Retrieving libs</echo>
+		<mkdir dir="${project.weblib}" />
+		<ivy:retrieve pattern="${project.weblib}/[artifact].[ext]"/>
+	</target>
+
+	<target name="compile" >
+
+		<available file="${ivy.jar.file}" property="ivy.resolve.skip" />
+
+		<antcall target="resolve-dependencies" />
+
+		<path id="project.classpath">
+			<fileset dir="${project.lib}" includes="**/*.jar" />
+			<fileset dir="${project.weblib}" includes="**/*.jar" />
+		</path>
+
+		<mkdir dir="${project.build}" />
+
+		<copy toDir="${project.build}">
+			<fileset dir="${project.src}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+
+		<javac destdir="${project.build}" debug="${project.debug}" debuglevel="source,lines,vars" source="${project.targetComp}" target="${project.targetComp}">
+			<src path="${project.src}" />
+			<classpath>
+				<path refid="project.classpath" />
+			</classpath>
+		</javac>
+
+	</target>
+
+	<target name="dist" depends="compile">
+		<ivy:info />
 		<mkdir dir="${project.dist}" />
 		<delete file="${project.dist}/${ant.project.name}.war" />
 
@@ -64,19 +94,5 @@
 			</fileset>
 		</war>
 	</target>
-
-	<target name="backup-init">
-	  <buildnumber/>
-    <mkdir dir="backup"/>
-	</target>
-
-	<target name="backup" depends="backup-init">
-		<zip destfile="backup/${ant.project.name}-${build.number}.zip" basedir="." level="9" update="false" excludes="backup" />
-	</target>
-	
-	<target name="backup-src" depends="backup-init">
-		<zip destfile="backup/${ant.project.name}-${build.number}.zip" basedir="." level="9" update="false" excludes="**/classes/** backup/** **/*.class **/*.jar" />
-	</target>
-	
 
 </project>

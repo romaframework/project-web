@@ -7,6 +7,6 @@
 	<entry key="src">src</entry>
 	<entry key="compile-time-lib">lib</entry>
 	<entry key="run-time-lib">WebContent/WEB-INF/lib</entry>
-	<entry key="ioc-path">src/META-INF/components</entry>
+	<entry key="ioc-path">src/main/java/META-INF/components</entry>
 	<entry key="ioc-file">applicationContext.xml</entry>
 </properties>
