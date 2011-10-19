@@ -81,8 +81,8 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 
 		if (sessInfo != null) {
 			if (log.isDebugEnabled())
-				log.debug("[HttpSessionAspect.removeSession] Removed session created: account=" + sessInfo.getAccount() + ", source=" + sessInfo.getSource()
-						+ ", created=" + sessInfo.getCreated());
+				log.debug("[HttpSessionAspect.removeSession] Removed session created: account=" + sessInfo.getAccount() + ", source="
+						+ sessInfo.getSource() + ", created=" + sessInfo.getCreated());
 		} else {
 			log.warn("[HttpSessionAspect.removeSession] Can't remove session because it doesn't registered: " + sessionId);
 			return null;
@@ -115,7 +115,7 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 	 * Read the property from active HttpSession
 	 */
 	public <T> T getProperty(String iKey) {
-		return (T)getProperty(null, iKey);
+		return (T) getProperty(null, iKey);
 	}
 
 	/**
@@ -158,4 +158,19 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 			sess.setAttribute(iKey, iValue);
 	}
 
+	@Override
+	public int getTimeout() {
+		HttpSession sess = (HttpSession) getActiveSystemSession();
+		if (sess != null)
+			return sess.getMaxInactiveInterval() / 60;
+		return -1;
+	}
+
+	@Override
+	public void setTimeout(int mins) {
+		HttpSession sess = (HttpSession) getActiveSystemSession();
+		if (sess != null)
+			sess.setMaxInactiveInterval(mins * 60);
+
+	}
 }
