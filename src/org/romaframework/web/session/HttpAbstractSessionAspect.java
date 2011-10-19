@@ -158,7 +158,6 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 			sess.setAttribute(iKey, iValue);
 	}
 
-	@Override
 	public int getTimeout() {
 		HttpSession sess = (HttpSession) getActiveSystemSession();
 		if (sess != null)
@@ -166,7 +165,6 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 		return -1;
 	}
 
-	@Override
 	public void setTimeout(int mins) {
 		HttpSession sess = (HttpSession) getActiveSystemSession();
 		if (sess != null)
