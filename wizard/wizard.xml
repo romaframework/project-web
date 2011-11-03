@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="add-module" name="roma-aspect-view-echo2-wizard">
 
-	<import file="../../roma-core-wizard/wizard/base-wizard.xml" />
+	<import file="${wizard.path}/base-wizard.xml" />
 
 	<target name="add-module">
-		<echo>Adding 'Web configuration' on project's web.xml -></echo>
-
-		<xmltask source="${project.path}/WebContent/WEB-INF/web.xml" dest="${project.path}/WebContent/WEB-INF/web.xml" preservetype="true" expandEntityReferences="false">
-			<insert path="/web-app/display-name" position="after" file="web.xml" />
-		</xmltask>
-
 		<!-- COPY SOURCES -->
 		<echo>Adding sources -></echo>
 		<copy todir="${project.path}/${project.src}/${project.package-path}/">
@@ -37,12 +31,6 @@
 			</filterset>
 		</copy>
 
-		<!-- COPY IMAGES -->
-		<copy todir="${project.path}/${project.src}/${project.package-path}/view/image">
-			<fileset dir="image">
-				<include name="*" />
-			</fileset>
-		</copy>
 	</target>
 
 </project>
