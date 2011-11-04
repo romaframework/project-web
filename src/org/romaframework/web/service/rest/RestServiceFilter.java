@@ -27,6 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,19 +40,19 @@ import org.romaframework.core.Roma;
 public class RestServiceFilter implements Filter {
 
 	protected RestServiceModule	restService;
-	protected static Log				log										= LogFactory.getLog(RestServiceFilter.class);
+	protected static Log				log	= LogFactory.getLog(RestServiceFilter.class);
 
 	public void init(FilterConfig iConfig) throws ServletException {
 		restService = Roma.component(RestServiceModule.class);
 	}
 
 	public void destroy() {
-		restService.shutdown();
 		restService = null;
 	}
 
 	public void doFilter(ServletRequest iRequest, ServletResponse iResponse, FilterChain iChain) throws IOException, ServletException {
 		if (restService != null) {
+
 			HttpServletRequest request = (HttpServletRequest) iRequest;
 
 			String requestURI = request.getRequestURI();
@@ -67,9 +68,8 @@ public class RestServiceFilter implements Filter {
 			String baseURI = request.getContextPath() + path;
 
 			String serviceURI = getServiceCall(requestURI, baseURI);
-			if (serviceURI != null && !(serviceURI.length() <= 0 || serviceURI.equals("/")) && request.getQueryString() == null
-					&& serviceURI.length() > 0 && !serviceURI.endsWith(".jsp") && !serviceURI.endsWith(".html")
-					&& !serviceURI.endsWith(".htm")) {
+			if (serviceURI != null && !(serviceURI.length() <= 0 || serviceURI.equals("/")) && request.getQueryString() == null && serviceURI.length() > 0
+					&& !serviceURI.endsWith(".jsp") && !serviceURI.endsWith(".html") && !serviceURI.endsWith(".htm")) {
 
 				// Service URL Syntax Check
 				if (serviceURI.startsWith("/"))
@@ -78,8 +78,7 @@ public class RestServiceFilter implements Filter {
 				if (serviceCallParameters.length < 2) {
 					log.error("[RestServiceFilter] Error on service call syntax: " + baseURI + "/" + serviceURI + ". It should be " + baseURI
 							+ "/<serviceName>/<operationName>/<parameter1>/.../<parameterN>");
-					request.getSession().setAttribute(RestServiceConstants.SESSION_I18N_ERROR_ATTRIBUTE_NAME,
-							"RestService.baseErrorMessage.error");
+					sendToServiceErrorPage(Roma.i18n().getString("RestServiceHelper.baseErrorMessage.error"), null, request, (HttpServletResponse) iResponse);
 					return;
 				}
 
@@ -87,23 +86,32 @@ public class RestServiceFilter implements Filter {
 				String serviceOperation = serviceCallParameters[1];
 
 				if (restService.existsServiceName(serviceName)) {
-					request.getSession().setAttribute(RestServiceConstants.SESSION_SERVICE_ATTRIBUTE_NAME, serviceName);
-					request.getSession().setAttribute(RestServiceConstants.SESSION_METHOD_ATTRIBUTE_NAME, serviceOperation);
-					request.getSession().setAttribute(RestServiceConstants.SESSION_PARAMETERS_ATTRIBUTE_NAME,
-							getParameters(serviceCallParameters));
+					try {
+						RestServiceModule restServiceAspect = Roma.component(RestServiceModule.class);
+						restServiceAspect.invokeService(request, (HttpServletResponse) iResponse, serviceName, serviceOperation, getParameters(serviceCallParameters));
+					} catch (Exception ie) {
+						sendToServiceErrorPage(Roma.i18n().getString("RestServiceHelper.baseErrorMessage.error"), ie, request, (HttpServletResponse) iResponse);
+					}
 				} else {
-					request.getSession().setAttribute(RestServiceConstants.SESSION_I18N_ERROR_ATTRIBUTE_NAME,
-							"RestService.serviceNotFound.error");
+					sendToServiceErrorPage(Roma.i18n().getString("RestService.serviceNotFound.error"), null, request, (HttpServletResponse) iResponse);
 				}
-
-				// iChain.doFilter(iRequest, iResponse);
-
-				// } else {
-				// RestServiceHelper.clearSession(request);
-				// return;
 			}
 		} // else
 		iChain.doFilter(iRequest, iResponse);
+	}
+
+	protected static void sendToServiceErrorPage(String errorMessage, Exception exception, HttpServletRequest request, HttpServletResponse response) {
+		request.getSession().setAttribute("ErrorMessage", errorMessage);
+		request.getSession().setAttribute("ExceptionThrown", exception);
+
+		String url = request.getContextPath() + "/dynamic/common/serviceError.jsp";
+		try {
+			response.sendRedirect(url);
+		} catch (IOException e1) {
+			log.error("Can't redirect to error page", e1);
+		} finally {
+			request.getSession().invalidate();
+		}
 	}
 
 	protected String getServiceCall(String requestURI, String baseURI) {

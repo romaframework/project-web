@@ -53,7 +53,7 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 	}
 
 	public Object getActiveSystemSession() {
-		return getServletRequest() == null ? null : getServletRequest().getSession();
+		return getServletRequest() == null ? null : getServletRequest().getSession(false);
 	}
 
 	public static HttpServletRequest getServletRequest() {
@@ -81,8 +81,8 @@ public abstract class HttpAbstractSessionAspect extends SessionAspectAbstract {
 
 		if (sessInfo != null) {
 			if (log.isDebugEnabled())
-				log.debug("[HttpSessionAspect.removeSession] Removed session created: account=" + sessInfo.getAccount() + ", source="
-						+ sessInfo.getSource() + ", created=" + sessInfo.getCreated());
+				log.debug("[HttpSessionAspect.removeSession] Removed session created: account=" + sessInfo.getAccount() + ", source=" + sessInfo.getSource() + ", created="
+						+ sessInfo.getCreated());
 		} else {
 			log.warn("[HttpSessionAspect.removeSession] Can't remove session because it doesn't registered: " + sessionId);
 			return null;

@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -17,27 +18,34 @@ import org.romaframework.aspect.service.UnmanagedServiceAspectAbstract;
 import org.romaframework.aspect.service.feature.ServiceClassFeatures;
 import org.romaframework.core.Roma;
 import org.romaframework.core.Utility;
+import org.romaframework.core.classloader.ClassLoaderListener;
 import org.romaframework.core.config.ApplicationConfiguration;
+import org.romaframework.core.flow.Controller;
 import org.romaframework.core.schema.SchemaClass;
 import org.romaframework.core.schema.SchemaClassResolver;
 import org.romaframework.core.schema.SchemaHelper;
 
-public class RestServiceModule extends UnmanagedServiceAspectAbstract {
+public class RestServiceModule extends UnmanagedServiceAspectAbstract implements ClassLoaderListener {
 
 	protected Map<String, SchemaClass>	services;
 	private static Log									log	= LogFactory.getLog(RestServiceModule.class);
 
 	public RestServiceModule() {
 		services = new HashMap<String, SchemaClass>();
+		Controller.getInstance().registerListener(ClassLoaderListener.class, this);
 	}
 
 	public void startup() throws RuntimeException {
-		discoveryServices(Utility.getApplicationAspectPackage(aspectName()));
 
 		if (additionalPaths != null)
-			for (String path : additionalPaths) {
-				discoveryServices(path);
-			}
+			additionalPaths = new HashSet<String>();
+		additionalPaths.add(Utility.getApplicationAspectPackage(aspectName()));
+		for (String pack : additionalPaths) {
+			if (pack == null || pack.trim().isEmpty())
+				continue;
+
+			Roma.component(SchemaClassResolver.class).addPackage(pack);
+		}
 	}
 
 	public void shutdown() throws RuntimeException {
@@ -72,9 +80,8 @@ public class RestServiceModule extends UnmanagedServiceAspectAbstract {
 	 * @throws SecurityException
 	 * 
 	 */
-	public void invokeService(HttpServletRequest iRequest, HttpServletResponse iResponse, String serviceName, String operation, String... parameters)
-			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnsupportedOperationException,
-			SecurityException, NoSuchMethodException {
+	public void invokeService(HttpServletRequest iRequest, HttpServletResponse iResponse, String serviceName, String operation, String... parameters) throws InstantiationException,
+			IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnsupportedOperationException, SecurityException, NoSuchMethodException {
 		Object service = createServiceInstance(services.get(serviceName));
 
 		Method[] methods = service.getClass().getMethods();
@@ -166,19 +173,20 @@ public class RestServiceModule extends UnmanagedServiceAspectAbstract {
 		throw new UnsupportedOperationException();
 	}
 
-	private void discoveryServices(String path) {
-		Roma.component(SchemaClassResolver.class).addPackage(path);
-		for (SchemaClass serviceClass : Roma.schema().getSchemaClassesByPackage(path)) {
-			if (serviceClass.isInterface())
+	public void onClassLoading(Class<?> iClass) {
+		for (String pack : getAdditionalPaths()) {
+			if (pack == null || pack.trim().isEmpty())
 				continue;
+			if (iClass.getPackage().getName().startsWith(pack)) {
+				SchemaClass serviceClass = Roma.schema().getSchemaClass(iClass);
+				String serviceName = (String) serviceClass.getFeature(ServiceClassFeatures.SERVICE_NAME);
+				Class<?> aspectImplementation = (Class<?>) serviceClass.getFeature(ServiceClassFeatures.ASPECT_IMPLEMENTATION);
 
-			// Create our service implementation
-			String serviceName = (String) serviceClass.getFeature(ServiceClassFeatures.SERVICE_NAME);
-			Class<?> aspectImplementation = (Class<?>) serviceClass.getFeature(ServiceClassFeatures.ASPECT_IMPLEMENTATION);
+				if (serviceName != null && serviceName.length() > 0 && (aspectImplementation == null || aspectImplementation.equals(getClass()))) {
+					services.put(serviceName, serviceClass);
+					log.info("[RestServiceModule] Registered service '" + serviceName + "' binded to class: " + serviceClass);
+				}
 
-			if (serviceName != null && serviceName.length() > 0 && (aspectImplementation == null || aspectImplementation.equals(getClass()))) {
-				services.put(serviceName, serviceClass);
-				log.info("[RestServiceModule] Registered service '" + serviceName + "' binded to class: " + serviceClass);
 			}
 		}
 	}
