@@ -61,6 +61,8 @@ public class RomaWebFilter implements Filter {
 			log.info("[RomaWebFilter.init] ContextRoot: " + absolutePath);
 
 			RomaApplicationContext.setApplicationPath(absolutePath);
+			RomaApplicationContext.setResourceAccessor(new ServletResourceAccessor(iConfig.getServletContext()));
+		
 
 			// CONFIGURE ROMA APPLICATION CONTEXT
 			RomaApplicationContext.getInstance().startup();
