@@ -1,6 +1,8 @@
 package org.romaframework.web;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -21,6 +23,14 @@ public class ServletResourceAccessor implements ResourceAccessor {
 
 	public InputStream getResourceAsStream(String name) {
 		return servletContext.getResourceAsStream(name);
+	}
+
+	public URL getResource(String name) {
+		try {
+			return servletContext.getResource(name);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
 	}
 
 }
