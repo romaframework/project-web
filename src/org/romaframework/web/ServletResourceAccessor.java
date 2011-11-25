@@ -17,6 +17,7 @@ public class ServletResourceAccessor implements ResourceAccessor {
 		this.servletContext = servletContext;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Set getResourcePaths(String name) {
 		return servletContext.getResourcePaths(name);
 	}
