@@ -30,7 +30,14 @@
 				<filter token="project.package" value="${project.package}" />
 			</filterset>
 		</copy>
-
+		<copy todir="${project.path}/${project.src}/${project.package-path}/view/domain/screen/">
+			<fileset dir=".">
+				<include name="accessible-screen.xml" />
+			</fileset>
+			<filterset>
+				<filter token="project.package" value="${project.package}" />
+			</filterset>
+		</copy>
 	</target>
 
 </project>
