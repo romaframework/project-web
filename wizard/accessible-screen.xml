@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <screen xmlns="http://www.romaframework.org/xml/roma" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
-	xsd:schemaLocation="http://www.romaframework.org/xml/roma http://www.romaframework.org/schema/roma-view-screen.xsd">
+	xsd:schemaLocation="http://www.romaframework.org/xml/roma http://www.romaframework.org/schema/roma-view-screen.xsd" defaultArea="body">
 
 	<area name="main" type="grid" size="1">
 		<area name="header" />
