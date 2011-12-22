@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project basedir="." default="compile" name="#{project.name}" xmlns:ivy="antlib:org.apache.ivy.ant">
 	<property environment="env" />
-	<property name="project.src" value="src" />
+	<property name="project.src" value="src/main/java" />
 	<property name="project.web" value="WebContent" />
 	<property name="project.lib" value="lib" />
 	<property name="project.weblib" value="${project.web}/WEB-INF/lib" />
