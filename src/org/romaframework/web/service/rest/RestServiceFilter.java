@@ -78,7 +78,7 @@ public class RestServiceFilter implements Filter {
 				if (serviceCallParameters.length < 2) {
 					log.error("[RestServiceFilter] Error on service call syntax: " + baseURI + "/" + serviceURI + ". It should be " + baseURI
 							+ "/<serviceName>/<operationName>/<parameter1>/.../<parameterN>");
-					sendToServiceErrorPage(Roma.i18n().getString("RestServiceHelper.baseErrorMessage.error"), null, request, (HttpServletResponse) iResponse);
+					sendToServiceErrorPage(Roma.i18n().get("RestServiceHelper.baseErrorMessage.error"), null, request, (HttpServletResponse) iResponse);
 					return;
 				}
 
@@ -90,10 +90,10 @@ public class RestServiceFilter implements Filter {
 						RestServiceModule restServiceAspect = Roma.component(RestServiceModule.class);
 						restServiceAspect.invokeService(request, (HttpServletResponse) iResponse, serviceName, serviceOperation, getParameters(serviceCallParameters));
 					} catch (Exception ie) {
-						sendToServiceErrorPage(Roma.i18n().getString("RestServiceHelper.baseErrorMessage.error"), ie, request, (HttpServletResponse) iResponse);
+						sendToServiceErrorPage(Roma.i18n().get("RestServiceHelper.baseErrorMessage.error"), ie, request, (HttpServletResponse) iResponse);
 					}
 				} else {
-					sendToServiceErrorPage(Roma.i18n().getString("RestService.serviceNotFound.error"), null, request, (HttpServletResponse) iResponse);
+					sendToServiceErrorPage(Roma.i18n().get("RestService.serviceNotFound.error"), null, request, (HttpServletResponse) iResponse);
 				}
 			}
 		} // else
