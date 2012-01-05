@@ -62,11 +62,13 @@ public class RomaWebFilter implements Filter {
 
 			RomaApplicationContext.setApplicationPath(absolutePath);
 			RomaApplicationContext.setResourceAccessor(new ServletResourceAccessor(iConfig.getServletContext()));
-		
 
 			// CONFIGURE ROMA APPLICATION CONTEXT
-			RomaApplicationContext.getInstance().startup();
-
+			try {
+				RomaApplicationContext.getInstance().startup();
+			} catch (Exception e) {
+				log.error("Error on starting up Roma", e);
+			}
 			timeMillis = System.currentTimeMillis() - timeMillis;
 
 			log.info("[RomaWebFilter.init] Startup completed in " + new SimpleDateFormat("mm:ss.S").format(new Date(timeMillis)) + ".");
