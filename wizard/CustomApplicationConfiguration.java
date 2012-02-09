@@ -33,7 +33,7 @@ public class CustomApplicationConfiguration extends AbstractApplicationConfigura
 	 * Callback called on every user disconnected from application
 	 */
 	public void endUserSession() {
-	  Roma.aspect(ViewAspect.class).pushCommand(new RedirectViewCommand("dynamic/common/logout.jsp"));
+	  Roma.aspect(ViewAspect.class).pushCommand(new RedirectViewCommand("dynamic/logout.jsp"));
 	}
 
 	public String getStatus() {
