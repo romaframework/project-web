@@ -17,6 +17,7 @@ package org.romaframework.web.session.domain.view;
 
 import javax.servlet.http.HttpSession;
 
+import org.romaframework.aspect.session.IdentityWeakHashMap;
 import org.romaframework.frontend.view.domain.activesession.SessionAttributeInfo;
 
 /**
@@ -26,24 +27,28 @@ import org.romaframework.frontend.view.domain.activesession.SessionAttributeInfo
  * 
  */
 public class HttpSessionAttributeInfo extends SessionAttributeInfo {
-  private HttpSession session;
+	private HttpSession	session;
 
-  public HttpSessionAttributeInfo(HttpSession iSession, String name) {
-    super(name);
-    session = iSession;
-  }
+	public HttpSessionAttributeInfo(HttpSession iSession, String name) {
+		super(name);
+		session = iSession;
+	}
 
-  @Override
-  public Object getValue() {
-    return session.getAttribute(name);
-  }
+	@Override
+	public Object getValue() {
+		Object value = session.getAttribute(name);
+		if (value instanceof IdentityWeakHashMap<?, ?>) {
+			value = "Roma Session";
+		}
+		return value;
+	}
 
-  @Override
-  public void setValue(Object value) {
-    session.setAttribute(name, value);
-  }
+	@Override
+	public void setValue(Object value) {
+		session.setAttribute(name, value);
+	}
 
-  public HttpSession getSession() {
-    return session;
-  }
+	public HttpSession getSession() {
+		return session;
+	}
 }

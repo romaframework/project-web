@@ -41,7 +41,6 @@ public class HttpActiveSessionInstance extends ActiveSessionInstance {
 			attributes.put(attrName, new HttpSessionAttributeInfo(sess, attrName));
 		}
 
-		Roma.fieldChanged(this, "attributes");
 	}
 
 	public void onAttributesAdd() {
